@@ -4,9 +4,9 @@
 
 #include "tilte.h"
 
-#define BLINK_PERIOD	(uint16_t)350
-#define BLINK_MIN_DIM	(uint16_t)10
-#define BLINK_MAX_DIM	(uint16_t)190
+#define BLINK_PERIOD	(uint32_t)1000
+#define BLINK_MIN_DIM	(uint32_t)10
+#define BLINK_MAX_DIM	(uint32_t)190
 
 #define TILTE_DIM		200
 #define TILTE_RICH		230
@@ -49,18 +49,18 @@ CRGB Tilte::Update(uint16_t elapsedTime)
 	case TILTE_STATE_CHOISE :
 		if (this->currentTime < BLINK_PERIOD)
 		{
-			// dim up
-			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MIN_DIM + ((BLINK_MAX_DIM - BLINK_MIN_DIM) * this->currentTime / BLINK_PERIOD));
+			// dim down
+			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MAX_DIM - ((BLINK_MAX_DIM - BLINK_MIN_DIM) * (uint32_t)this->currentTime / BLINK_PERIOD));
 		}		
 		else if (this->currentTime < (2 * BLINK_PERIOD) )
 		{
-			// dim down
-			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MAX_DIM - ((BLINK_MAX_DIM - BLINK_MIN_DIM) * (this->currentTime - BLINK_PERIOD) / BLINK_PERIOD));
+			// dim up
+			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MIN_DIM + ((BLINK_MAX_DIM - BLINK_MIN_DIM) * ((uint32_t)this->currentTime - BLINK_PERIOD) / BLINK_PERIOD));
 		}
 		else
 		{
 			this->currentTime = 0;
-			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MIN_DIM);
+			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MAX_DIM);
 		}
 		
 	case TILTE_STATE_LOCK:
