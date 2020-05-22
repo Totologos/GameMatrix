@@ -25,7 +25,7 @@ Tilte::Tilte()
 	this->currentTime = 0;
 }
 
-Tilte::Tilte(uint8_t x, uint8_t y)
+void Tilte::init(uint8_t x, uint8_t y)
 {
 	this->x = x;
 	this->y = y;

@@ -25,7 +25,7 @@ private:
 
 public:
 	Tilte();
-	Tilte(uint8_t x, uint8_t y);
+	void			init(uint8_t x, uint8_t y);
 
 	void			SetState(tTilteStates state);
 	tTilteStates	GetState(void);

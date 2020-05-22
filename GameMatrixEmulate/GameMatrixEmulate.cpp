@@ -10,11 +10,11 @@
 #define GAME_HEIGHT		7
 #define NUM_LEDS		(GAME_WIDTH * GAME_HEIGHT)
 
-Tilte tiltes[GAME_WIDTH][GAME_HEIGHT];
+Tilte **tiltes;
 
 uint8_t level1[] =
 {
-	0, 0, 0, 0, 0, 0, 0,
+	1, 1, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
@@ -25,26 +25,34 @@ uint8_t level1[] =
 
 void setup()
 {
-	for (uint8_t y = 0; y < 7; y++)
+	tiltes = new Tilte*[GAME_HEIGHT];
+	for (uint8_t i = 0; i < GAME_WIDTH; i++)
 	{
-		for (uint8_t x = 0; x < 7; x++)
+		tiltes[i] = new Tilte[GAME_WIDTH];
+	}		
+
+	for (uint8_t y = 0; y < GAME_HEIGHT; y++)
+	{
+		for (uint8_t x = 0; x < GAME_WIDTH; x++)
 		{
-			tiltes[x][y] = Tilte(x, y);
+			tiltes[x][y].init(x, y);
 		}
 	}
 
-	gamePlay.init((Tilte**)tiltes, GAME_WIDTH, GAME_HEIGHT);
+	gamePlay.init(tiltes, GAME_WIDTH, GAME_HEIGHT);
 
 	gamePlay.loadGame(level1);
 }
 
-void loop()
+void displayArray()
 {
-	for (uint8_t i = 0; i < GAME_HEIGHT; i++)
+	
+	// display array
+	for (uint8_t y = 0; y < GAME_HEIGHT; y++)
 	{
-		for (uint8_t j = 0; j < GAME_WIDTH; i++)
+		for (uint8_t x = 0; x < GAME_WIDTH; x++)
 		{
-			std::cout << tiltes[i][j].Update(5);
+			std::cout << tiltes[x][y].Update(5) << ' ';
 		}
 		std::cout << '\n';
 	}
@@ -52,12 +60,40 @@ void loop()
 
 int main()
 {
-    std::cout << "Setup()\n"; 
+	char key = ' ';
+	std::cout << "Setup()\n"; 
 	setup();
 	std::cout << "loop()\n";
-	for (int i = 0; i < 1; i++)
+	while( key != 'q')
 	{
-		loop();
+		switch (key)
+		{
+		case '8':
+			gamePlay.keyEvent(KEY_ARROW_UP);
+			break;
+		case '2':
+			gamePlay.keyEvent(KEY_ARROW_DOWN);
+			break;
+		case '4':
+			gamePlay.keyEvent(KEY_ARROW_LEFT);
+			break;
+		case '6':
+			gamePlay.keyEvent(KEY_ARROW_RIGHT);
+			break;
+		case '1':
+			gamePlay.keyEvent(KEY_BUTTON_A);
+			break;		
+		case '3':
+				gamePlay.keyEvent(KEY_BUTTON_B);
+				break;
+		default:
+			break;
+		}
+		
+		for(int i =0; i <50; i++)
+			gamePlay.keyEvent(KEY_NONE);
+		displayArray();
+		std::cin >> key;
 	}
 	std::cout << "end\n";
 

@@ -4,28 +4,28 @@
 
 #include "GamePlay.h"
 
-
-
-void GamePlay::init(Tilte** tiltes, uint8_t width, uint8_t height)
+void GamePlay::loadGame(uint8_t levelId)
 {
-	this->tiltes = tiltes;
-	this->width = width;
-	this->height = height;
-
-
+	if (levelId < this->numOfLevels)
+	{
+		this->levelId = levelId;
+	}
+	loadGame();
 }
 
-void GamePlay::loadGame(uint8_t* level)
+void GamePlay::loadGame(void)
 {
-	for (uint8_t y = 0; y < this->height; y++)
+	size_t offset = this->levelId * this->height * this->width;
+	for (size_t y = 0; y < this->height; y++)
 	{
-		for (uint8_t x = 0; x < this->width; x++)
+		for (size_t x = 0; x < this->width; x++)
 		{
-			this->tiltes[x][y].SetState(level[ y * this->width + x ] == 1 ? TILTE_STATE_LOCK : TILTE_STATE_EMPTY);
+			this->tiltes[x][y].SetState(this->levels[offset + y * (size_t)this->width + x] == 1 ? TILTE_STATE_LOCK : TILTE_STATE_EMPTY);
 		}
 	}
 
 	resetGame();
+
 }
 
 void GamePlay::resetGame()
@@ -52,63 +52,114 @@ void GamePlay::resetGame()
 			}
 		}
 	}
-	this->tiltes[this->curY][this->curX].SetState(TILTE_STATE_CHOISE);
+	this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_CHOISE);
 }
 
 void  GamePlay::keyEvent(tKeys key)
 {
-	if (this->lastKey != key)
+	if (this->lastKey != key && key != KEY_NONE)
 	{
 		switch (this->gameSequence)
 		{
 		case GAME_SEQUENCE_START_POINT:
+		{
 			switch (key)
 			{
 			case KEY_ARROW_UP:
 			case KEY_ARROW_DOWN:
 			case KEY_ARROW_LEFT:
 			case KEY_ARROW_RIGHT:
-				this->tiltes[this->curY][this->curX].SetState(TILTE_STATE_EMPTY);
+				this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_EMPTY);
 				do
 				{
 					switch (key)
 					{
 					case KEY_ARROW_UP:		this->curY = (this->curY - 1 + this->height) % this->height;	break;
 					case KEY_ARROW_DOWN:	this->curY = (this->curY + 1 + this->height) % this->height;	break;
-					case KEY_ARROW_LEFT:	this->curY = (this->curX - 1 + this->width) % this->width;		break;
-					case KEY_ARROW_RIGHT:	this->curY = (this->curX + 1 + this->width) % this->width;		break;
+					case KEY_ARROW_LEFT:	this->curX = (this->curX - 1 + this->width) % this->width;		break;
+					case KEY_ARROW_RIGHT:	this->curX = (this->curX + 1 + this->width) % this->width;		break;
 					}
-				} while (this->tiltes[this->curY][this->curX].GetState() != TILTE_STATE_EMPTY);
-				this->tiltes[this->curY][this->curX].SetState(TILTE_STATE_CHOISE);
+				} while (this->tiltes[this->curX][this->curY].GetState() != TILTE_STATE_EMPTY);
+				this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_CHOISE);
 				break;
 
 			case KEY_BUTTON_A:
-				this->tiltes[this->curY][this->curX].SetState(TILTE_STATE_START);
+				this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_START);
 				this->gameSequence = GAME_SEQUENCE_MOOVED;
 				this->selectedDirection = GAME_PLAY_DIR_NONE;
 				this->update();
 				break;
 			case KEY_BUTTON_B:
-				// do nothing... maybe select another level
+				loadGame(this->levelId < this->numOfLevels - 1 ? this->levelId + 1 : 0);
 				break;
 
 			}
 			break;
-
+		}
 		case GAME_SEQUENCE_MOOVED:
+		{
 			switch (key)
 			{
 			case KEY_ARROW_UP:
-				if (canSelect(this->curX, this->curY - 1))
+			case KEY_ARROW_DOWN:
+			case KEY_ARROW_LEFT:
+			case KEY_ARROW_RIGHT:
+				if (canSelect(this->curX, this->curY - 1) && (key == KEY_ARROW_UP || this->onlyOneDir))
 				{
 					eraseChoose();
 					this->curY--;
-					this->tiltes[this->curY][this->curX].SetState(TILTE_STATE_VALIDATED);
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
 					this->selectedDirection = GAME_PLAY_DIR_UP;
-					update();
+					this->update();
+				}
+				else if (canSelect(this->curX, this->curY + 1) && (key == KEY_ARROW_DOWN || this->onlyOneDir))
+				{
+					eraseChoose();
+					this->curY++;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+					this->selectedDirection = GAME_PLAY_DIR_DOWN;
+					this->update();
+				}				
+				else if (canSelect(this->curX - 1, this->curY) && (key == KEY_ARROW_LEFT || this->onlyOneDir))
+				{
+					eraseChoose();
+					this->curX--;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+					this->selectedDirection = GAME_PLAY_DIR_LEFT;
+					this->update();
+				}
+				else if (canSelect(this->curX + 1, this->curY) && (key == KEY_ARROW_RIGHT || this->onlyOneDir))
+				{
+					eraseChoose();
+					this->curX++;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+					this->selectedDirection = GAME_PLAY_DIR_RIGHT;
+					this->update();
 				}
 				break;
+			case KEY_BUTTON_A:
+			case KEY_BUTTON_B:
+				this->resetGame();
+				break;
 			}
+			break;
+		}
+		case GAME_SEQUENCE_RESTART:
+			if (key == KEY_BUTTON_A)
+			{
+				this->resetGame();
+			}
+			break;
+
+		default :
+			break;
+		}
+	}
+	else
+	{
+		EVERY_N_MILLISECONDS(20)
+		{
+			this->update();
 		}
 	}
 	this->lastKey = key;
@@ -116,55 +167,141 @@ void  GamePlay::keyEvent(tKeys key)
 
 void  GamePlay::update(void)
 {
-
-	uint8_t numOfChoise = 0;
-	if (this->canMoove(this->curX + 1, this->curY))
-		numOfChoise++;
-
-	if (this->canMoove(this->curX - 1, this->curY))
-		numOfChoise++;
-
-	if (this->canMoove(this->curX, this->curY + 1))
-		numOfChoise++;
-
-	if (this->canMoove(this->curX, this->curY - 1))
-		numOfChoise++;
-
-	if (numOfChoise == 0)
+	switch (this->gameSequence)
 	{
-		// game over or win !
-
-	}
-	else if (this->selectedDirection == GAME_PLAY_DIR_NONE)
+	case GAME_SEQUENCE_MOOVED:
 	{
-		// wait user press à key
+		uint8_t numOfChoise = 0;
 		if (this->canMoove(this->curX + 1, this->curY))
-			this->tiltes[this->curX + 1, this->curY]->SetState(TILTE_STATE_CHOISE);
+			numOfChoise++;
 
 		if (this->canMoove(this->curX - 1, this->curY))
-			this->tiltes[this->curX - 1, this->curY]->SetState(TILTE_STATE_CHOISE);
+			numOfChoise++;
 
 		if (this->canMoove(this->curX, this->curY + 1))
-			this->tiltes[this->curX, this->curY + 1]->SetState(TILTE_STATE_CHOISE);
+			numOfChoise++;
 
 		if (this->canMoove(this->curX, this->curY - 1))
-			this->tiltes[this->curX, this->curY - 1]->SetState(TILTE_STATE_CHOISE);
-	}
-	else
-	{
-		switch (this->selectedDirection)
+			numOfChoise++;
+
+		if (numOfChoise == 0)
 		{
-		case GAME_PLAY_DIR_UP:
-			if (this->canMoove(this->curX, this->curY - 1))
+			// game over or win !
+			this->gameSequence = GAME_SEQUENCE_WIN;
+			for (uint8_t y = 0; y < this->height; y++)
 			{
-				this->curY--;				
-				this->tiltes[this->curX, this->curY]->SetState(TILTE_STATE_VALIDATED);
+				for (uint8_t x = 0; x < this->width; x++)
+				{
+					if (this->tiltes[x][y].GetState() == TILTE_STATE_EMPTY)
+					{
+						this->gameSequence = GAME_SEQUENCE_GAME_OVER;
+					}
+				}
 			}
-			else
+			this->curX = 0;
+			this->curY = 0;
+		}
+		else if (this->selectedDirection == GAME_PLAY_DIR_NONE)
+		{
+			onlyOneDir = numOfChoise == 1;
+			// wait user press à key
+			if (this->canMoove(this->curX + 1, this->curY))
+				this->tiltes[this->curX + 1][this->curY].SetState(TILTE_STATE_CHOISE);
+
+			if (this->canMoove(this->curX - 1, this->curY))
+				this->tiltes[this->curX - 1][this->curY].SetState(TILTE_STATE_CHOISE);
+
+			if (this->canMoove(this->curX, this->curY + 1))
+				this->tiltes[this->curX][this->curY + 1].SetState(TILTE_STATE_CHOISE);
+
+			if (this->canMoove(this->curX, this->curY - 1))
+				this->tiltes[this->curX][this->curY - 1].SetState(TILTE_STATE_CHOISE);
+		}
+		else
+		{
+			switch (this->selectedDirection)
 			{
-				this->selectedDirection = GAME_PLAY_DIR_NONE;
+			case GAME_PLAY_DIR_UP:
+				if (this->canMoove(this->curX, this->curY - 1))
+				{
+					this->curY--;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+				}
+				else
+				{
+					this->selectedDirection = GAME_PLAY_DIR_NONE;
+				}
+				break;
+			case GAME_PLAY_DIR_DOWN:
+				if (this->canMoove(this->curX, this->curY + 1))
+				{
+					this->curY++;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+				}
+				else
+				{
+					this->selectedDirection = GAME_PLAY_DIR_NONE;
+				}
+				break;
+			case GAME_PLAY_DIR_LEFT:
+				if (this->canMoove(this->curX - 1, this->curY))
+				{
+					this->curX--;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+				}
+				else
+				{
+					this->selectedDirection = GAME_PLAY_DIR_NONE;
+				}
+				break;
+			case GAME_PLAY_DIR_RIGHT:
+				if (this->canMoove(this->curX + 1, this->curY))
+				{
+					this->curX++;
+					this->tiltes[this->curX][this->curY].SetState(TILTE_STATE_VALIDATED);
+				}
+				else
+				{
+					this->selectedDirection = GAME_PLAY_DIR_NONE;
+				}
+				break;
 			}
 		}
+		break;
+	}
+
+	case GAME_SEQUENCE_WIN:
+	case GAME_SEQUENCE_GAME_OVER:
+
+		if (this->gameSequence == GAME_SEQUENCE_GAME_OVER && this->tiltes[curX][curY].GetState() != TILTE_STATE_LOCK)
+		{
+			this->tiltes[curX][curY].SetState(TILTE_STATE_LOOSE);
+		}
+		else if (this->gameSequence == GAME_SEQUENCE_WIN && this->tiltes[curX][curY].GetState() != TILTE_STATE_LOCK)
+		{
+			this->tiltes[curX][curY].SetState(TILTE_STATE_START);
+		}
+
+		if (this->curX < this->width -1)
+		{
+			this->curX++;
+		}
+		else if (this->curY < this->height -1)
+		{
+			this->curX = 0;
+			this->curY++;
+		}
+		else
+		{
+			this->gameSequence = GAME_SEQUENCE_RESTART;
+		}
+
+		
+
+		break;
+
+	default:
+		break;
 	}
 
 }
@@ -176,7 +313,7 @@ bool GamePlay::canMoove(uint8_t x, uint8_t y)
 		return false;
 	if (y >= this->height)
 		return false;
-	return this->tiltes[x][y].GetState() == TILTE_STATE_EMPTY;
+	return this->tiltes[x][y].GetState() == TILTE_STATE_EMPTY || this->tiltes[x][y].GetState() == TILTE_STATE_CHOISE;
 }
 
 bool GamePlay::canSelect(uint8_t x, uint8_t y)

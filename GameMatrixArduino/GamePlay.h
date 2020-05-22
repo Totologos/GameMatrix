@@ -15,6 +15,7 @@
 
 typedef enum tKeys
 {
+	KEY_NONE			= 0x0,
 	KEY_ARROW_UP		= 0x1,
 	KEY_ARROW_DOWN		= 0x2,
 	KEY_ARROW_LEFT		= 0x4,
@@ -36,7 +37,8 @@ typedef enum tGameSequences
 {
 	GAME_SEQUENCE_START_POINT,
 	GAME_SEQUENCE_MOOVED,
-	GAME_SEQUENCE_END,
+	GAME_SEQUENCE_GAME_OVER,
+	GAME_SEQUENCE_WIN,
 	GAME_SEQUENCE_RESTART,
 } tGameSequences;
 
@@ -45,7 +47,7 @@ typedef enum tGameSequences
 class GamePlay
 {
  private:
-	 Tilte **tiltes;
+	 Tilte **tiltes;	 
 	 uint8_t width;
 	 uint8_t height;
 	 uint8_t curX;
@@ -54,18 +56,30 @@ class GamePlay
 	 tGameSequences gameSequence;
 	 tGamePlayDir availableDirection;
 	 tGamePlayDir selectedDirection;
+	 bool		onlyOneDir;
+	 uint8_t	*levels;
+	 uint8_t	levelId;
+	 uint8_t	numOfLevels;
 	 
 
 	 void resetGame(void);
 	 bool canMoove(uint8_t x, uint8_t y);
 	 bool canSelect(uint8_t x, uint8_t y);
-	 void update(void);
+	 
 	 void eraseChoose(void);
 
  public:
-	void init(Tilte **tiltes, uint8_t width, uint8_t height);
-	void loadGame(uint8_t* level);
-
+   void init(Tilte **tiltes, uint8_t width, uint8_t height, uint8_t* levels, uint8_t numOfLevels)
+   {
+	   this->tiltes = tiltes;
+	   this->width = width;
+	   this->height = height;
+	   this->numOfLevels = numOfLevels;
+	   this->levels = levels;
+	}
+	void loadGame(uint8_t index);
+	void loadGame(void);
+	void update(void);
 
 	void keyEvent(tKeys key);
 
