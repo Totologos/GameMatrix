@@ -1,14 +1,16 @@
 /*
- Name:		Sketch1.ino
+ Name:		GameMatrixAdruino.ino
  Created:	18/05/2020 09:53:43
  Author:	Totologos
 */
 #include "GamePlay.h"
 
+// size of game
 #define GAME_WIDTH		7
 #define GAME_HEIGHT		7
 #define NUM_LEDS		(GAME_WIDTH * GAME_HEIGHT)
 
+// hardware definition
 #define DATA_LED_PIN	2
 
 #define ARROW_UP_PIN  5
@@ -24,8 +26,8 @@ CRGB leds[NUM_LEDS];
 uint8_t keys = KEY_NONE;
 uint8_t keysPrev = KEY_NONE;
 uint32_t endDebounce = 0;
-uint8_t keyStart = 0;
 
+// tilte position => led index
 const uint8_t ledsIndex[GAME_WIDTH][GAME_WIDTH] =
 {
 	{ 0, 13, 14, 27, 28, 41, 42},
@@ -37,7 +39,7 @@ const uint8_t ledsIndex[GAME_WIDTH][GAME_WIDTH] =
 	{ 6, 7,  20, 21, 34, 35, 48}
 };
 
-#define NUM_OF_LEVELS	6
+#define NUM_OF_LEVELS	10
 uint8_t levels[] =
 
 	{
@@ -50,20 +52,52 @@ uint8_t levels[] =
 		0, 0, 0, 0, 0, 0, 0,
 
 		0, 0, 0, 0, 0, 0, 0,
-		0, 1, 1, 1, 1, 1, 0,
-		0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0,
-		0, 1, 1, 1, 1, 1, 0,
-		0, 0, 0, 0, 0, 0, 0,
-
-		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 1, 1, 1,
+
+		1, 1, 1, 1, 1, 1, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 1, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 1, 1,
+		1, 1, 1, 1, 1, 1, 1,
+
+		1, 1, 1, 1, 1, 1, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 1, 0, 1, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 1, 1, 1, 1,
+
+		1, 1, 1, 1, 1, 1, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 1, 0, 1, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 1, 1, 0, 1, 1,
+		1, 0, 0, 0, 0, 1, 1,
+		1, 1, 1, 1, 1, 1, 1,
+
+		1, 1, 1, 1, 1, 1, 1,
+		1, 0, 0, 1, 1, 1, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 0, 0, 0, 0, 0, 1,
+		1, 1, 1, 0, 0, 0, 1,
+		1, 1, 1, 1, 1, 1, 1,
+
+		0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 0, 0,
 
 		0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0,
@@ -93,6 +127,7 @@ uint8_t levels[] =
 // the setup function runs once when you press reset or power the board
 void setup()
 {
+	// init hardware ressources 
 	pinMode(LED_BUILTIN, OUTPUT);
 	pinMode(ARROW_DOWN_PIN, INPUT_PULLUP);
 	pinMode(ARROW_UP_PIN, INPUT_PULLUP);
@@ -101,21 +136,15 @@ void setup()
 	pinMode(BUTTON_A_PIN, INPUT_PULLUP);
 	pinMode(BUTTON_B_PIN, INPUT_PULLUP);
 
+	FastLED.addLeds<WS2811, DATA_LED_PIN, GRB>(leds, NUM_LEDS);
+
+
+	// create tiltes matrix and init game play
 	tiltes = new Tilte*[GAME_HEIGHT];
 	for (uint8_t i = 0; i < GAME_WIDTH; i++)
 	{
 		tiltes[i] = new Tilte[GAME_WIDTH];
 	}
-
-	for (uint8_t y = 0; y < GAME_HEIGHT; y++)
-	{
-		for (uint8_t x = 0; x < GAME_WIDTH; x++)
-		{
-			tiltes[x][y].Init(x, y);
-		}
-	}
-
-	FastLED.addLeds<WS2811, DATA_LED_PIN, GRB>(leds, NUM_LEDS);
 
 	gamePlay.init((Tilte**) tiltes, GAME_WIDTH, GAME_HEIGHT, levels, NUM_OF_LEVELS);
 
@@ -135,7 +164,6 @@ void loop()
 			for (uint8_t j = 0; j < GAME_WIDTH; j++)
 			{
 				leds[ ledsIndex[j][i] ] = tiltes[i][j].Update(5);
-				
 			}
 		}
 		FastLED.show();
@@ -163,6 +191,4 @@ void loop()
 		gamePlay.keyEvent(KEY_NONE);
 	}
 	keysPrev = keys;
-
-	delay(10);
 }

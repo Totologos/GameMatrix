@@ -20,26 +20,20 @@ typedef enum tTilteStates
 	TILTE_STATE_CHOISE,
 	TILTE_STATE_VALIDATED,
 	TILTE_STATE_LOOSE,
+	TILTE_STATE_WIN,
 }tTilteStates;
 
 class Tilte
 {
 private:
-	uint8_t			x;
-	uint8_t			y;
 	tTilteStates	state;
 	uint16_t		currentTime;
 
 public:
 					Tilte();
-
-	void			Init(uint8_t x, uint8_t y);
 	void			SetState(tTilteStates state);
 	tTilteStates	GetState(void);
 	CRGB			Update(uint16_t elapsedTime);
-	uint8_t			GetX(void)						{ return this->x; }
-	uint8_t			GetY(void)						{ return this->y; }
-
 };
 
 #endif

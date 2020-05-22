@@ -4,7 +4,7 @@
 
 #include "tilte.h"
 
-#define BLINK_PERIOD	(uint16_t)300
+#define BLINK_PERIOD	(uint16_t)350
 #define BLINK_MIN_DIM	(uint16_t)10
 #define BLINK_MAX_DIM	(uint16_t)190
 
@@ -20,23 +20,17 @@
 
 Tilte::Tilte()
 {
-	this->x = 0;
-	this->y = 0;
-	this->state = TILTE_STATE_EMPTY;
-	this->currentTime = 0;
-}
-
-void Tilte::Init(uint8_t x, uint8_t y)
-{
-	this->x = x;
-	this->y = y;
 	this->state = TILTE_STATE_EMPTY;
 	this->currentTime = 0;
 }
 
 void Tilte::SetState(tTilteStates state)
 {
-	this->state = state;
+	if (state != this->state)
+	{
+		this->currentTime = 0; 
+		this->state = state;
+	}	
 }
 
 tTilteStates Tilte::GetState(void)
@@ -44,6 +38,8 @@ tTilteStates Tilte::GetState(void)
 	return this->state;
 }
 
+/* must be call as soon as possible 
+ * return current color of LED */
 CRGB Tilte::Update(uint16_t elapsedTime)
 {
 	this->currentTime += elapsedTime;
@@ -66,11 +62,11 @@ CRGB Tilte::Update(uint16_t elapsedTime)
 			this->currentTime = 0;
 			return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, BLINK_MIN_DIM);
 		}
-		//return CHSV(TILTE_COLOR_CHOISE, TILTE_RICH, TILTE_DIM);
 		
 	case TILTE_STATE_LOCK:
 		return CHSV(TILTE_COLOR_LOCK, TILTE_RICH, TILTE_DIM);
 
+	case TILTE_STATE_WIN:
 	case TILTE_STATE_START:
 		return CHSV(TILTE_COLOR_START, TILTE_RICH, TILTE_DIM);
 
