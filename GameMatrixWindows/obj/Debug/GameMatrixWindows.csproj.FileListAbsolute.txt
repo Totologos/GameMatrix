@@ -1,0 +1,15 @@
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\bin\Debug\GameMatrix.exe.config
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\bin\Debug\GameMatrix.exe
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\bin\Debug\GameMatrix.pdb
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrixWindows.csprojAssemblyReference.cache
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\MainWindow.g.cs
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\App.g.cs
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrix_MarkupCompile.cache
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrix_MarkupCompile.lref
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\MainWindow.baml
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrix.g.resources
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrix.Properties.Resources.resources
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrixWindows.csproj.GenerateResource.cache
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrixWindows.csproj.CoreCompileInputs.cache
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrix.exe
+C:\Users\ECA\Source\Repos\GameMatrix2\GameMatrixWindows\obj\Debug\GameMatrix.pdb

@@ -1,0 +1,15 @@
+﻿  pch.cpp
+  GamePlay.cpp
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(160): error C3861: 'EVERY_N_MILLISECONDS' : identificateur introuvable
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(162): error C2059: erreur de syntaxe : ';'
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(165): error C2059: erreur de syntaxe : 'this'
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(166): error C2059: erreur de syntaxe : '}'
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(166): error C2143: erreur de syntaxe : absence de ';' avant '}'
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(169): error C2143: erreur de syntaxe : absence de ';' avant '{'
+c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.cpp(169): error C2447: '{' : en-tête de fonction manquant (liste formelle à l'ancien format ?)
+  GameMatrixEmulate.cpp
+c:\users\eca\source\repos\gamematrix2\gamematrixemulate\gamematrixemulate.cpp(42): error C2660: 'GamePlay::init' : la fonction ne prend pas 3 arguments
+  c:\users\eca\source\repos\gamematrix2\gamematrixarduino\gameplay.h(72): note: voir la déclaration de 'GamePlay::init'
+c:\users\eca\source\repos\gamematrix2\gamematrixemulate\gamematrixemulate.cpp(44): error C2664: 'void GamePlay::loadGame(void)' : impossible de convertir l'argument 1 de 'uint8_t [49]' en 'uint8_t'
+  c:\users\eca\source\repos\gamematrix2\gamematrixemulate\gamematrixemulate.cpp(44): note: Aucun contexte dans lequel cette conversion est possible
+  tilte_emulate.cpp
