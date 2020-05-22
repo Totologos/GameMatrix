@@ -40,6 +40,7 @@ typedef enum tGameSequences
 	GAME_SEQUENCE_GAME_OVER,
 	GAME_SEQUENCE_WIN,
 	GAME_SEQUENCE_RESTART,
+	GAME_SEQUENCE_NEXT_LEVEL,
 } tGameSequences;
 
 

@@ -190,6 +190,12 @@ void  GamePlay::keyEvent(tKeys key)
 				this->resetGame();
 			}
 			break;
+		case GAME_SEQUENCE_NEXT_LEVEL:
+			if (key == KEY_BUTTON_A)
+			{
+				loadGame(this->levelId < this->numOfLevels - 1 ? this->levelId + 1 : 0);
+			}
+			break;
 
 		default :
 			break;
@@ -344,9 +350,9 @@ void  GamePlay::update(void)
 			this->curX = 0;
 			this->curY++;
 		}
-		else
+		else 
 		{
-			this->gameSequence = GAME_SEQUENCE_RESTART;
+			this->gameSequence = (this->gameSequence == GAME_SEQUENCE_WIN) ? GAME_SEQUENCE_NEXT_LEVEL : GAME_SEQUENCE_RESTART;
 		}
 
 		break;
